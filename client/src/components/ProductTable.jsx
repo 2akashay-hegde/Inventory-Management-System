@@ -75,6 +75,7 @@ export default function ProductTable({ products, onEdit, onDelete, onQuickAdjust
           <thead>
             <tr>
               <th>Product Name</th>
+              <th>Unique ID</th>
               <th>Category</th>
               <th>Unit Price</th>
               <th>Status</th>
@@ -93,6 +94,7 @@ export default function ProductTable({ products, onEdit, onDelete, onQuickAdjust
                   })
                 : '—';
               const productId = product.id || product._id;
+              const uniqueCode = product.uniqueId || product.productCode || (productId ? `PRD-${productId.slice(-6).toUpperCase()}` : 'N/A');
 
               return (
                 <tr
@@ -103,9 +105,13 @@ export default function ProductTable({ products, onEdit, onDelete, onQuickAdjust
                   {/* Product Name */}
                   <td>
                     <div className="product-name-main">{product.name}</div>
-                    <div className="product-id-sub font-mono">
-                      #{productId ? productId.slice(-8).toUpperCase() : 'N/A'}
-                    </div>
+                  </td>
+
+                  {/* Unique ID */}
+                  <td>
+                    <span className="product-id-badge font-mono" title={`Full MongoDB ID: ${productId}`}>
+                      {uniqueCode}
+                    </span>
                   </td>
 
                   {/* Category */}

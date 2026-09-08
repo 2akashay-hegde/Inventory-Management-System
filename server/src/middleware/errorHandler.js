@@ -10,11 +10,14 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Mongoose duplicate key error
+  // Mongoose duplicate key error (Unique constraint violation)
   if (err.code === 11000) {
+    const field = Object.keys(err.keyValue || {})[0] || 'Unique ID';
+    const value = err.keyValue ? err.keyValue[field] : '';
+    const fieldName = field === 'uniqueId' ? 'Unique ID' : field;
     return res.status(400).json({
       success: false,
-      message: 'Duplicate value entered for a unique field'
+      message: `${fieldName} "${value}" is already assigned to another product`
     });
   }
 

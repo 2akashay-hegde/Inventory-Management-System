@@ -18,8 +18,8 @@
 
 InventoryHub lets you manage your product catalog from a single dashboard:
 
-- ➕ **Add, edit, and delete** products
-- 🔍 **Search** by product name (server-side MongoDB query)
+- ➕ **Add, edit, and delete** products with distinct **Unique IDs** (duplicate validation prevents reassignment)
+- 🔍 **Search** by product name or Unique ID (server-side MongoDB query)
 - 🗂️ **Filter** by category (server-side)
 - 🚨 **Low stock alerts** — rows highlighted automatically when `quantity ≤ minStock`
 - 📊 **Live dashboard stats** — total products, units, and inventory value (updates with active filters)

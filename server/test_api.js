@@ -42,6 +42,7 @@ async function runTests() {
   console.log('\n[TEST 3] POST /products');
   const newProductPayload = {
     name: 'Test Desk Mat Extra Large',
+    uniqueId: 'PRD-TEST-99',
     category: 'Accessories',
     price: 24.99,
     quantity: 12,
@@ -54,9 +55,24 @@ async function runTests() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }
   }, newProductPayload);
-  console.log('Status:', res.status, '| Created product ID:', res.body.data?.id);
+  console.log('Status:', res.status, '| Created product ID:', res.body.data?.id, '| uniqueId:', res.body.data?.uniqueId);
   if (res.status !== 201 || !res.body.data?.id) throw new Error('POST /products failed');
   const createdId = res.body.data.id;
+
+  // 3b. Duplicate POST /products check
+  console.log('\n[TEST 3b] Duplicate uniqueId POST /products');
+  const dupRes = await request({
+    host: 'localhost',
+    port: 5000,
+    path: '/products',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, newProductPayload);
+  console.log('Status:', dupRes.status, '| Message:', dupRes.body?.message);
+  if (dupRes.status !== 400 || !dupRes.body?.message?.includes('already assigned')) {
+    throw new Error('Duplicate check failed to return 400 with "already assigned" message');
+  }
+  console.log('Validation passed: Duplicate Unique ID properly blocked!');
 
   // 4. PUT /products/:id
   console.log(`\n[TEST 4] PUT /products/${createdId}`);

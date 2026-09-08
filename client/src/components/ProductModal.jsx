@@ -12,9 +12,16 @@ const CATEGORIES = [
   'Other'
 ];
 
-export default function ProductModal({ isOpen, onClose, onSubmit, initialData = null, isSubmitting = false }) {
+export default function ProductModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialData = null,
+  isSubmitting = false,
+  existingProducts = []
+}) {
   const [formData, setFormData] = useState({
-    name: '', category: 'Electronics', price: '', quantity: '', minStock: '5'
+    name: '', uniqueId: '', category: 'Electronics', price: '', quantity: '', minStock: '5'
   });
   const [errors, setErrors] = useState({});
 
@@ -22,13 +29,14 @@ export default function ProductModal({ isOpen, onClose, onSubmit, initialData = 
     if (initialData) {
       setFormData({
         name: initialData.name || '',
+        uniqueId: initialData.uniqueId || '',
         category: initialData.category || 'Electronics',
         price: initialData.price !== undefined ? initialData.price : '',
         quantity: initialData.quantity !== undefined ? initialData.quantity : '',
         minStock: initialData.minStock !== undefined ? initialData.minStock : '5'
       });
     } else {
-      setFormData({ name: '', category: 'Electronics', price: '', quantity: '', minStock: '5' });
+      setFormData({ name: '', uniqueId: '', category: 'Electronics', price: '', quantity: '', minStock: '5' });
     }
     setErrors({});
   }, [initialData, isOpen]);
@@ -37,8 +45,33 @@ export default function ProductModal({ isOpen, onClose, onSubmit, initialData = 
 
   const validate = () => {
     const e = {};
-    if (!formData.name.trim()) e.name = 'Product name is required';
-    else if (formData.name.trim().length < 2) e.name = 'Name must be at least 2 characters';
+    const trimmedName = formData.name.trim();
+    const trimmedId = formData.uniqueId.trim().toUpperCase();
+
+    if (!trimmedName) {
+      e.name = 'Product name is required';
+    } else if (trimmedName.length < 2) {
+      e.name = 'Name must be at least 2 characters';
+    }
+
+    if (!trimmedId) {
+      e.uniqueId = 'Unique ID is required';
+    } else if (trimmedId.length < 2) {
+      e.uniqueId = 'Unique ID must be at least 2 characters';
+    } else {
+      // Check if ID is already assigned to another product
+      const currentEditingId = initialData?.id || initialData?._id;
+      const isDuplicate = existingProducts.some((p) => {
+        const prodId = p.id || p._id;
+        const sameId = (p.uniqueId || '').toUpperCase() === trimmedId;
+        return sameId && prodId !== currentEditingId;
+      });
+
+      if (isDuplicate) {
+        e.uniqueId = `Unique ID "${trimmedId}" is already assigned!`;
+      }
+    }
+
     if (!formData.category.trim()) e.category = 'Category is required';
     if (formData.price === '' || isNaN(formData.price) || Number(formData.price) < 0)
       e.price = 'Enter a valid price (≥ 0)';
@@ -55,6 +88,7 @@ export default function ProductModal({ isOpen, onClose, onSubmit, initialData = 
     if (!validate()) return;
     onSubmit({
       name: formData.name.trim(),
+      uniqueId: formData.uniqueId.trim().toUpperCase(),
       category: formData.category.trim(),
       price: parseFloat(formData.price),
       quantity: parseInt(formData.quantity, 10),
@@ -101,6 +135,35 @@ export default function ProductModal({ isOpen, onClose, onSubmit, initialData = 
                 autoFocus
               />
               {errors.name && <div className="form-error">⚠ {errors.name}</div>}
+            </div>
+
+            {/* Unique ID */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="product-uniqueId">
+                Unique Product ID <span style={{ color: '#EF4444' }}>*</span>
+              </label>
+              <input
+                id="product-uniqueId"
+                name="uniqueId"
+                type="text"
+                className="form-input font-mono"
+                placeholder="e.g. PRD-101 or SKU-990"
+                value={formData.uniqueId}
+                onChange={(e) => {
+                  const val = e.target.value.toUpperCase();
+                  setFormData(prev => ({ ...prev, uniqueId: val }));
+                  if (errors.uniqueId) setErrors(prev => ({ ...prev, uniqueId: null }));
+                }}
+              />
+              <p className="form-hint">
+                Must be a distinct identifier across all products.
+              </p>
+              {errors.uniqueId && (
+                <div className="form-error" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span>⚠</span>
+                  <strong>{errors.uniqueId}</strong>
+                </div>
+              )}
             </div>
 
             {/* Category */}

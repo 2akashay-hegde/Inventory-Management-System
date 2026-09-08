@@ -5,6 +5,7 @@ const Product = require('./models/Product');
 const sampleProducts = [
   {
     name: 'Wireless Ergonomic Keyboard',
+    uniqueId: 'PRD-101',
     category: 'Electronics',
     price: 79.99,
     quantity: 35,
@@ -12,6 +13,7 @@ const sampleProducts = [
   },
   {
     name: 'Precision Gaming Mouse',
+    uniqueId: 'PRD-102',
     category: 'Electronics',
     price: 49.50,
     quantity: 4, // LOW STOCK
@@ -19,6 +21,7 @@ const sampleProducts = [
   },
   {
     name: '27-inch 4K UHD Monitor',
+    uniqueId: 'PRD-103',
     category: 'Electronics',
     price: 329.99,
     quantity: 8,
@@ -26,6 +29,7 @@ const sampleProducts = [
   },
   {
     name: 'USB-C Multi-Port Hub (7-in-1)',
+    uniqueId: 'PRD-104',
     category: 'Accessories',
     price: 39.99,
     quantity: 2, // LOW STOCK
@@ -33,6 +37,7 @@ const sampleProducts = [
   },
   {
     name: 'Noise-Cancelling Headphones',
+    uniqueId: 'PRD-105',
     category: 'Electronics',
     price: 189.00,
     quantity: 14,
@@ -40,6 +45,7 @@ const sampleProducts = [
   },
   {
     name: 'Adjustable Aluminium Laptop Stand',
+    uniqueId: 'PRD-106',
     category: 'Accessories',
     price: 34.99,
     quantity: 22,
@@ -47,6 +53,7 @@ const sampleProducts = [
   },
   {
     name: 'Heavy Duty Thermal Shipping Label Printer',
+    uniqueId: 'PRD-107',
     category: 'Office Supplies',
     price: 120.00,
     quantity: 3, // LOW STOCK
@@ -54,6 +61,7 @@ const sampleProducts = [
   },
   {
     name: 'Gel Ergonomic Wrist Rest Pad',
+    uniqueId: 'PRD-108',
     category: 'Accessories',
     price: 14.95,
     quantity: 45,
@@ -61,6 +69,7 @@ const sampleProducts = [
   },
   {
     name: 'Recycled Shipping Boxes (Pack of 25)',
+    uniqueId: 'PRD-109',
     category: 'Packaging',
     price: 28.50,
     quantity: 5, // LOW STOCK
@@ -68,6 +77,7 @@ const sampleProducts = [
   },
   {
     name: 'Reinforced Kraft Packing Tape (6 Rolls)',
+    uniqueId: 'PRD-110',
     category: 'Packaging',
     price: 18.00,
     quantity: 50,

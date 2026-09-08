@@ -6,12 +6,23 @@ const Product = require('../models/Product');
  */
 exports.createProduct = async (req, res, next) => {
   try {
-    const { name, category, price, quantity, minStock } = req.body;
+    const { name, uniqueId, category, price, quantity, minStock } = req.body;
 
-    if (!name || !category || price === undefined || quantity === undefined || minStock === undefined) {
+    if (!name || !uniqueId || !category || price === undefined || quantity === undefined || minStock === undefined) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields: name, category, price, quantity, minStock'
+        message: 'Please provide all required fields: name, uniqueId, category, price, quantity, minStock'
+      });
+    }
+
+    const trimmedUniqueId = uniqueId.trim().toUpperCase();
+
+    // Check if uniqueId already exists
+    const existing = await Product.findOne({ uniqueId: trimmedUniqueId });
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: `Unique ID "${trimmedUniqueId}" is already assigned to "${existing.name}"`
       });
     }
 
@@ -31,6 +42,7 @@ exports.createProduct = async (req, res, next) => {
 
     const product = await Product.create({
       name: name.trim(),
+      uniqueId: trimmedUniqueId,
       category: category.trim(),
       price: numPrice,
       quantity: numQty,
@@ -57,7 +69,10 @@ exports.getProducts = async (req, res, next) => {
     let query = {};
 
     if (search) {
-      query.name = { $regex: search, $options: 'i' };
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { uniqueId: { $regex: search, $options: 'i' } }
+      ];
     }
 
     if (category && category !== 'All') {
@@ -125,8 +140,21 @@ exports.getProductById = async (req, res, next) => {
  */
 exports.updateProduct = async (req, res, next) => {
   try {
-    const { name, category, price, quantity, minStock } = req.body;
+    const { name, uniqueId, category, price, quantity, minStock } = req.body;
     const updateFields = {};
+
+    if (uniqueId !== undefined) {
+      const trimmedId = uniqueId.trim().toUpperCase();
+      // Check if another product already has this uniqueId
+      const conflict = await Product.findOne({ uniqueId: trimmedId, _id: { $ne: req.params.id } });
+      if (conflict) {
+        return res.status(400).json({
+          success: false,
+          message: `Unique ID "${trimmedId}" is already assigned to "${conflict.name}"`
+        });
+      }
+      updateFields.uniqueId = trimmedId;
+    }
 
     if (name !== undefined) updateFields.name = name.trim();
     if (category !== undefined) updateFields.category = category.trim();

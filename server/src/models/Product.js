@@ -9,6 +9,15 @@ const productSchema = new mongoose.Schema(
       minlength: [2, 'Product name must be at least 2 characters'],
       maxlength: [120, 'Product name cannot exceed 120 characters']
     },
+    uniqueId: {
+      type: String,
+      required: [true, 'Unique ID is required'],
+      unique: true,
+      trim: true,
+      uppercase: true,
+      minlength: [2, 'Unique ID must be at least 2 characters'],
+      maxlength: [30, 'Unique ID cannot exceed 30 characters']
+    },
     category: {
       type: String,
       required: [true, 'Product category is required'],
