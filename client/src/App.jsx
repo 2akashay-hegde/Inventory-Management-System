@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Search, ChevronDown, AlertTriangle } from 'lucide-react';
+import { Search, ChevronDown, AlertTriangle, Activity, Calendar } from 'lucide-react';
 import { productApi } from './api/productApi';
 import Navbar from './components/Navbar';
 import StatsOverview from './components/StatsOverview';
@@ -189,6 +189,21 @@ export default function App() {
         }}
         loading={loading}
       />
+
+      {/* Dashboard Blue/Purple Gradient Hero Banner (from Reference Screenshot) */}
+      <div className="dashboard-hero-banner">
+        <div className="hero-text-wrap">
+          <h2 className="hero-title">
+            <Activity size={26} strokeWidth={2.4} />
+            Dashboard
+          </h2>
+          <p className="hero-subtitle">Example dashboard overview and inventory management summary</p>
+        </div>
+        <div className="hero-date-badge">
+          <Calendar size={15} />
+          <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</span>
+        </div>
+      </div>
 
       {/* KPI Overview Metrics — reflects active filter */}
       <StatsOverview

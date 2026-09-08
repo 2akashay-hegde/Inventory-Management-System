@@ -1,5 +1,22 @@
 const BASE_URL = '/products';
 
+async function safeJson(response, fallbackMsg = 'Network request failed') {
+  const text = await response.text();
+  let data = null;
+  if (text && text.trim()) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text };
+    }
+  }
+  if (!response.ok) {
+    const errorMsg = (data && data.message) || fallbackMsg;
+    throw new Error(errorMsg);
+  }
+  return data || {};
+}
+
 export const productApi = {
   // 1. Get all products with optional search and category
   async getProducts(search = '', category = '') {
@@ -9,17 +26,13 @@ export const productApi = {
 
     const url = params.toString() ? `${BASE_URL}?${params.toString()}` : BASE_URL;
     const response = await fetch(url);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to fetch products');
-    return data;
+    return safeJson(response, 'Failed to fetch products');
   },
 
   // 2. Get low stock products
   async getLowStockProducts() {
     const response = await fetch(`${BASE_URL}/low-stock`);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to fetch low stock items');
-    return data;
+    return safeJson(response, 'Failed to fetch low stock items');
   },
 
   // 3. Add product
@@ -29,9 +42,7 @@ export const productApi = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productData),
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to create product');
-    return data;
+    return safeJson(response, 'Failed to create product');
   },
 
   // 4. Update product
@@ -41,9 +52,7 @@ export const productApi = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productData),
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to update product');
-    return data;
+    return safeJson(response, 'Failed to update product');
   },
 
   // 5. Delete product
@@ -51,16 +60,12 @@ export const productApi = {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'DELETE',
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to delete product');
-    return data;
+    return safeJson(response, 'Failed to delete product');
   },
 
   // 6. Get inventory summary metrics
   async getStats() {
     const response = await fetch(`${BASE_URL}/summary/stats`);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to fetch inventory metrics');
-    return data;
+    return safeJson(response, 'Failed to fetch inventory metrics');
   }
 };
