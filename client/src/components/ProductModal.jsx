@@ -18,28 +18,40 @@ export default function ProductModal({
   onSubmit,
   initialData = null,
   isSubmitting = false,
-  existingProducts = []
+  existingProducts = [],
+  availableCategories = []
 }) {
   const [formData, setFormData] = useState({
     name: '', uniqueId: '', category: 'Electronics', price: '', quantity: '', minStock: '5'
   });
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Merge default categories with whatever categories already exist in database
+  const allCategoryOptions = React.useMemo(() => {
+    const set = new Set([...CATEGORIES, ...availableCategories.filter(c => c && c !== 'All')]);
+    return Array.from(set);
+  }, [availableCategories]);
 
   useEffect(() => {
     if (initialData) {
+      const cat = initialData.category || 'Electronics';
+      const isCustom = !CATEGORIES.includes(cat) && !availableCategories.includes(cat);
+      setIsCustomCategory(false);
       setFormData({
         name: initialData.name || '',
         uniqueId: initialData.uniqueId || '',
-        category: initialData.category || 'Electronics',
+        category: cat,
         price: initialData.price !== undefined ? initialData.price : '',
         quantity: initialData.quantity !== undefined ? initialData.quantity : '',
         minStock: initialData.minStock !== undefined ? initialData.minStock : '5'
       });
     } else {
+      setIsCustomCategory(false);
       setFormData({ name: '', uniqueId: '', category: 'Electronics', price: '', quantity: '', minStock: '5' });
     }
     setErrors({});
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, availableCategories]);
 
   if (!isOpen) return null;
 
@@ -98,6 +110,11 @@ export default function ProductModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'category' && value === '__NEW__') {
+      setIsCustomCategory(true);
+      setFormData(prev => ({ ...prev, category: '' }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
   };
@@ -168,18 +185,54 @@ export default function ProductModal({
 
             {/* Category */}
             <div className="form-group">
-              <label className="form-label" htmlFor="product-category">Category</label>
-              <select
-                id="product-category"
-                name="category"
-                className="form-input"
-                value={formData.category}
-                onChange={handleChange}
-              >
-                {CATEGORIES.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <label className="form-label" htmlFor="product-category" style={{ marginBottom: 0 }}>Category</label>
+                <button
+                  type="button"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#2563EB',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: 0,
+                    textDecoration: 'underline'
+                  }}
+                  onClick={() => setIsCustomCategory(!isCustomCategory)}
+                >
+                  {isCustomCategory ? '← Pick from list' : '+ Add new category'}
+                </button>
+              </div>
+
+              {isCustomCategory ? (
+                <div>
+                  <input
+                    id="product-category"
+                    name="category"
+                    type="text"
+                    className="form-input"
+                    placeholder="Type new category name..."
+                    value={formData.category}
+                    onChange={handleChange}
+                    autoFocus
+                  />
+                  <p className="form-hint">Enter a name for the new category</p>
+                </div>
+              ) : (
+                <select
+                  id="product-category"
+                  name="category"
+                  className="form-input"
+                  value={formData.category}
+                  onChange={handleChange}
+                >
+                  {allCategoryOptions.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                  <option value="__NEW__">+ Add Custom Category...</option>
+                </select>
+              )}
               {errors.category && <div className="form-error">⚠ {errors.category}</div>}
             </div>
 

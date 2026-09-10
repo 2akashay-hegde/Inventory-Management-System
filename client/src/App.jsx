@@ -281,6 +281,7 @@ export default function App() {
         initialData={editingProduct}
         isSubmitting={saving}
         existingProducts={products}
+        availableCategories={allCategories}
       />
 
       {/* Delete Confirmation Modal */}
